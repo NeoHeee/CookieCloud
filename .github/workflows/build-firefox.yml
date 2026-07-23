@@ -64,6 +64,17 @@ jobs:
       - name: Build Firefox extension
         run: pnpm zip
 
+      - name: Record WXT output files
+        run: find . -maxdepth 6 -type f -printf '%p\n' | sort > /tmp/wxt-output-files.txt
+
+      - name: Upload WXT output diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: wxt-output-files
+          path: /tmp/wxt-output-files.txt
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Normalize Firefox package and extract manifest
         run: |
           mkdir -p dist
