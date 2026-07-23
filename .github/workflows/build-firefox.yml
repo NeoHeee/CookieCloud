@@ -66,13 +66,16 @@ jobs:
 
       - name: Normalize Firefox package and extract manifest
         run: |
-          BUILT_ZIP="$(find dist -maxdepth 1 -type f -name '*.zip' -print -quit)"
+          mkdir -p dist
+          BUILT_ZIP="$(find . -type f \( -name '*.zip' -o -name '*.xpi' \) -print -quit)"
           test -n "$BUILT_ZIP"
           RELEASE_ZIP="dist/CookieCloud-Community-for-Firefox-v1.0.4.zip"
-          if [ "$BUILT_ZIP" != "$RELEASE_ZIP" ]; then
+          if [ "$(realpath "$BUILT_ZIP")" != "$(realpath -m "$RELEASE_ZIP")" ]; then
             cp "$BUILT_ZIP" "$RELEASE_ZIP"
           fi
-          unzip -p "$RELEASE_ZIP" manifest.json > /tmp/firefox-manifest.json
+          MANIFEST_ENTRY="$(unzip -Z1 "$RELEASE_ZIP" | grep -E '(^|/)manifest\.json$' | head -n 1)"
+          test -n "$MANIFEST_ENTRY"
+          unzip -p "$RELEASE_ZIP" "$MANIFEST_ENTRY" > /tmp/firefox-manifest.json
           test -s /tmp/firefox-manifest.json
 
       - name: Upload packaged manifest
