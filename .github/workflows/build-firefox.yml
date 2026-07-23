@@ -48,7 +48,18 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check TypeScript
-        run: pnpm compile
+        run: |
+          set -o pipefail
+          pnpm compile 2>&1 | tee /tmp/typescript-check.log
+
+      - name: Upload TypeScript diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-check-log
+          path: /tmp/typescript-check.log
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Build Firefox extension
         run: pnpm zip
