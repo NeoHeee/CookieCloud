@@ -4,7 +4,6 @@
   <p>基于 easychen/CookieCloud 的 Firefox 社区适配版，同时面向 Firefox Desktop 与 Firefox Android。</p>
 
   <p>
-    <a href="https://github.com/NeoHeee/CookieCloud-Community-for-Firefox/actions/workflows/build-firefox.yml">获取最新构建</a> ·
     <a href="PRIVACY.md">隐私说明</a> ·
     <a href="https://github.com/easychen/CookieCloud">上游项目</a>
   </p>
