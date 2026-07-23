@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="ext/public/icon/icon.png" width="112" alt="CookieCloud">
   <h1>CookieCloud Community for Firefox</h1>
   <p><strong>将浏览器 Cookie 与可选的 Local Storage 加密同步到你自己的服务器</strong></p>
   <p>基于 easychen/CookieCloud 的 Firefox 社区适配版，同时面向 Firefox Desktop 与 Firefox Android。</p>
