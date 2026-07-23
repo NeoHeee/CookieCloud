@@ -64,38 +64,14 @@ jobs:
       - name: Build Firefox extension
         run: pnpm zip
 
-      - name: Record WXT output files
-        run: find . -maxdepth 6 -type f -printf '%p\n' | sort > /tmp/wxt-output-files.txt
-
-      - name: Upload WXT output diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: wxt-output-files
-          path: /tmp/wxt-output-files.txt
-          if-no-files-found: error
-          retention-days: 7
-
       - name: Normalize Firefox package and extract manifest
         run: |
-          mkdir -p dist
-          BUILT_ZIP="$(find . -type f \( -name '*.zip' -o -name '*.xpi' \) -print -quit)"
+          BUILT_ZIP="$(find dist -maxdepth 1 -type f -name '*-firefox.zip' -print -quit)"
           test -n "$BUILT_ZIP"
           RELEASE_ZIP="dist/CookieCloud-Community-for-Firefox-v1.0.4.zip"
-          if [ "$(realpath "$BUILT_ZIP")" != "$(realpath -m "$RELEASE_ZIP")" ]; then
-            cp "$BUILT_ZIP" "$RELEASE_ZIP"
-          fi
-          MANIFEST_ENTRY="$(unzip -Z1 "$RELEASE_ZIP" | grep -E '(^|/)manifest\.json$' | head -n 1)"
-          test -n "$MANIFEST_ENTRY"
-          unzip -p "$RELEASE_ZIP" "$MANIFEST_ENTRY" > /tmp/firefox-manifest.json
+          cp "$BUILT_ZIP" "$RELEASE_ZIP"
+          unzip -p "$RELEASE_ZIP" manifest.json > /tmp/firefox-manifest.json
           test -s /tmp/firefox-manifest.json
-
-      - name: Upload packaged manifest
-        uses: actions/upload-artifact@v4
-        with:
-          name: packaged-firefox-manifest
-          path: /tmp/firefox-manifest.json
-          if-no-files-found: error
-          retention-days: 7
 
       - name: Verify Firefox manifest
         run: |
@@ -159,6 +135,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cookiecloud-community-for-firefox-source
-          path: ext/dist/*source.zip
+          path: ext/dist/*-source.zip
           if-no-files-found: error
           retention-days: 30
