@@ -54,7 +54,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cookiecloud-firefox
-          path: ext/.output/*.zip
-          include-hidden-files: true
+          path: ext/dist/*.zip
           if-no-files-found: error
           retention-days: 30
