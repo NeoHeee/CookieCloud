@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="ext/public/icon/128.png" width="128" alt="CookieCloud Community for Firefox">
+  <img src="ext/public/icon/icon.svg" width="128" alt="CookieCloud Community for Firefox">
   <h1>CookieCloud Community for Firefox</h1>
   <p><strong>Firefox Desktop 与 Firefox Android 专用的 CookieCloud 社区版扩展</strong></p>
   <p>同步 Cookie，并可选同步匹配域名的 Local Storage；数据在浏览器本地加密后发送到用户配置的 CookieCloud 服务端。</p>
@@ -28,44 +28,54 @@
 - Chrome、Edge 或其他 Chromium 浏览器的构建与发布流程；
 - 上游示例、SDK、截图和无关脚手架文件。
 
-CookieCloud 服务端和其他平台版本请前往上游项目：[easychen/CookieCloud](https://github.com/easychen/CookieCloud)。
+服务端部署及其他浏览器版本请查看 [easychen/CookieCloud](https://github.com/easychen/CookieCloud)。
 
-> 本项目是社区维护的 Firefox 适配版本，不是 easychen 原作者发布的官方 Firefox 扩展。
+## 当前版本
 
-## 支持范围
+### Firefox v1.0.4
 
-| 平台 | 状态 | 最低版本 |
+- Firefox Desktop：支持；
+- Firefox Android：支持 Firefox 120 及以上版本；
+- Android 页面：适配全屏扩展页面、底部安全区和移动端触控尺寸；
+- 自动检查：TypeScript、Manifest、扩展图标和 Mozilla `web-ext lint`；
+- 图标：采用 Firefox 原生支持的 SVG 矢量图标，小尺寸使用简化版本，避免模糊、缺失或 PNG 损坏。
+
+## 浏览器支持
+
+| 浏览器 | 状态 | 说明 |
 |---|---|---|
-| Firefox Desktop | ✅ 支持 | 由 AMO Manifest 决定 |
-| Firefox Android | 🧪 已适配 | Firefox 120+ |
+| Firefox Desktop | ✅ 支持 | 已完成桌面端功能测试 |
+| Firefox Android 120+ | 🧪 已适配 | Manifest 与移动布局已完成，建议继续进行真机复测 |
+| Chrome / Edge | ❌ 不包含 | 请使用上游项目提供的官方版本 |
 
-Firefox Android 已加入 Manifest 声明、全屏移动布局、触控尺寸和安全区域适配。发布前仍建议在真机复测上传、下载、定时同步和 Local Storage 同步。
+Firefox 与 Chromium 的 Cookie 数据结构存在差异，**不要让 Firefox 与 Chrome/Edge 使用同一个上传 UUID**，避免相互覆盖。
 
-## 功能
+## Firefox Android 测试重点
 
-- 手动或定时上传、下载 Cookie；
-- 按域名关键词筛选同步范围；
-- 域名黑名单；
-- 可选同步 Local Storage；
-- Cookie Keep Alive；
-- 用户自定义服务端地址和附加请求 Header；
-- 本地加密后再传输同步载荷。
+1. 扩展页面能否正常打开，并完整显示所有配置项；
+2. 输入法弹出时服务器地址、UUID、密码等输入框是否仍可滚动到可见区域；
+3. 保存设置后重启 Firefox，配置是否保留；
+4. 手动上传、下载及测试按钮是否正常；
+5. 定时同步是否会在浏览器后台运行；
+6. Cookie 覆盖后目标网站登录状态是否恢复；
+7. 启用 Local Storage 后，对应数据是否正确同步；
+8. 页面底部按钮是否被 Android 导航栏或手势区域遮挡。
 
-## 安全提醒
+## 安全须知
 
-Cookie 属于高敏感登录凭据。本扩展需要申请 `cookies`、`<all_urls>` 等高权限才能工作。建议：
+Cookie 是网站登录状态的重要凭据。CookieCloud 为实现同步，需要申请读取网站 Cookie 和访问网站数据的高权限。请按高敏感工具管理：
 
-- 优先连接可信的自建 CookieCloud 服务端，并使用 HTTPS；
-- UUID 和密码使用互不重复的随机值，密码建议至少 24 位；
-- 不同步网银、支付、主邮箱、密码管理器、域名注册商、Cloudflare 或 NAS 管理后台；
-- 不需要 Local Storage 时将其关闭；
-- Firefox 与 Chrome/Edge 使用不同 UUID，避免数据格式相互覆盖。
+- 优先使用自己的 CookieCloud 服务端，不建议长期使用公共测试服务器；
+- 服务端必须使用 HTTPS，避免公网明文传输；
+- UUID 和密码均使用独立随机值，密码建议至少 24 位；
+- 不要同步网银、支付、主邮箱、密码管理器、域名注册商、Cloudflare、NAS 管理后台等关键账户；
+- Local Storage 可能包含长期 Token，不需要时不要开启；
+- Firefox、Chrome 和 Edge 分别使用不同 UUID；
+- 定期更换密码，停用时清除服务端数据和本地扩展配置。
 
-详见 [PRIVACY.md](PRIVACY.md)。
+扩展在上传前会在浏览器本地加密同步内容，但加密不能消除弱密码、浏览器失陷、恶意服务端或配置泄露带来的风险。详见 [隐私说明](PRIVACY.md)。
 
-## 本地开发
-
-需要 Node.js 22 与 pnpm 10.28.0：
+## 本地构建
 
 ```bash
 git clone https://github.com/NeoHeee/CookieCloud-Community-for-Firefox.git
@@ -75,43 +85,17 @@ corepack enable
 corepack prepare pnpm@10.28.0 --activate
 pnpm install --frozen-lockfile
 pnpm compile
-pnpm dev
-```
-
-## 构建 Firefox 包
-
-```bash
-cd ext
-pnpm install --frozen-lockfile
-pnpm compile
 pnpm zip
 ```
 
-输出目录：
+构建文件位于 `ext/dist/`。详细可复现构建说明见 [ext/AMO_BUILD.md](ext/AMO_BUILD.md)。
 
-```text
-ext/dist/*firefox*.zip
-```
+## 项目关系与许可证
 
-未签名 ZIP 只适合开发测试。正式版 Firefox 长期安装需要由 Mozilla AMO 签名。
-
-## 目录结构
-
-```text
-.github/workflows/build-firefox.yml  Firefox 构建与校验
-ext/                                Firefox 扩展源码
-  entrypoints/                      后台、内容脚本与设置界面
-  public/                           多语言和图标
-  utils/                            Cookie、存储和加密逻辑
-  AMO_BUILD.md                      Mozilla 可复现构建说明
-LICENSE                             GPL-3.0
-PRIVACY.md                          隐私说明
-```
-
-## 许可证与来源
-
-- 上游项目：[easychen/CookieCloud](https://github.com/easychen/CookieCloud)
+- 上游项目及服务端：[easychen/CookieCloud](https://github.com/easychen/CookieCloud)
 - Firefox 社区版：[NeoHeee/CookieCloud-Community-for-Firefox](https://github.com/NeoHeee/CookieCloud-Community-for-Firefox)
+- 问题反馈：[GitHub Issues](https://github.com/NeoHeee/CookieCloud-Community-for-Firefox/issues)
+- 隐私说明：[PRIVACY.md](PRIVACY.md)
 - 许可证：[GNU General Public License v3.0](LICENSE)
 
-感谢原作者 easychen 及所有贡献者。本仓库的修改继续按照 GPL-3.0 发布。
+感谢原作者 easychen 及所有贡献者。本仓库的改动继续按照 GPL-3.0 发布。

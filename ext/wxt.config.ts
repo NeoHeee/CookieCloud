@@ -1,5 +1,13 @@
 import { defineConfig } from 'wxt';
 
+const extensionIcons = {
+  16: 'icon/icon-small.svg',
+  32: 'icon/icon-small.svg',
+  48: 'icon/icon.svg',
+  96: 'icon/icon.svg',
+  128: 'icon/icon.svg'
+};
+
 export default defineConfig({
   outDir: 'dist',
   modules: ['@wxt-dev/webextension-polyfill'],
@@ -7,6 +15,10 @@ export default defineConfig({
     name: '__MSG_appTitle__',
     description: '__MSG_appDesc__',
     default_locale: 'zh_CN',
+    icons: extensionIcons,
+    browser_action: {
+      default_icon: extensionIcons
+    },
     permissions: [
       'cookies',
       'tabs',
@@ -15,8 +27,8 @@ export default defineConfig({
       'unlimitedStorage'
     ],
     host_permissions: ['<all_urls>'],
-    // Mozilla already supports data_collection_permissions, while the
-    // currently pinned WXT manifest types have not added the field yet.
+    // Mozilla supports data_collection_permissions, while the currently
+    // pinned WXT manifest types have not added the field yet.
     browser_specific_settings: {
       gecko: {
         id: 'cookiecloud-firefox@neoheee.github.io',
@@ -27,8 +39,8 @@ export default defineConfig({
       gecko_android: {
         strict_min_version: '120.0'
       }
-    } as any
-  },
+    }
+  } as any,
   vite: () => ({
     css: {
       postcss: './postcss.config.js'
