@@ -1,22 +1,15 @@
 {
-  "name": "cookie-cloud",
-  "displayName": "CookieCloud",
-  "description": "Sync cookies between browses",
+  "name": "cookiecloud-community-for-firefox",
+  "displayName": "CookieCloud Community for Firefox",
+  "description": "Synchronize Firefox cookies and optional Local Storage with a user-configured CookieCloud server.",
   "private": true,
   "version": "1.0.4",
   "type": "module",
   "scripts": {
-    "dev": "wxt",
-    "dev:firefox": "wxt -b firefox",
-    "build": "wxt build",
-    "build:chrome": "wxt build -b chrome",
-    "build:firefox": "wxt build -b firefox",
-    "zip": "wxt zip",
-    "zip:chrome": "wxt zip -b chrome",
-    "zip:firefox": "wxt zip -b firefox",
+    "dev": "wxt -b firefox",
+    "build": "wxt build -b firefox",
+    "zip": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "github:build": "node scripts/release.mjs --mode=build",
-    "github:release": "node scripts/release.mjs --mode=release",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {

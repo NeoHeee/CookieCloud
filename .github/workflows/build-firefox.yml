@@ -3,15 +3,16 @@ name: Build Firefox Extension
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "ext/**"
+      - "README.md"
       - "PRIVACY.md"
       - ".github/workflows/build-firefox.yml"
   pull_request:
     paths:
       - "ext/**"
+      - "README.md"
       - "PRIVACY.md"
       - ".github/workflows/build-firefox.yml"
 
@@ -21,7 +22,7 @@ permissions:
 jobs:
   build-firefox:
     name: Build Firefox Desktop + Android package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ext
@@ -47,96 +48,93 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check TypeScript
-        run: pnpm compile
+        run: |
+          set -o pipefail
+          pnpm compile 2>&1 | tee /tmp/typescript-check.log
+
+      - name: Upload TypeScript diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-check-log
+          path: /tmp/typescript-check.log
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Build Firefox extension
-        run: pnpm zip:firefox
+        run: pnpm zip
 
-      - name: Verify Firefox Desktop and Android manifest
+      - name: Normalize Firefox package and extract manifest
         run: |
-          ZIP_PATH="$(find dist -maxdepth 1 -type f -name '*firefox*.zip' -print -quit)"
-          test -n "$ZIP_PATH"
-          unzip -p "$ZIP_PATH" manifest.json > /tmp/firefox-manifest.json
+          BUILT_ZIP="$(find dist -maxdepth 1 -type f -name '*-firefox.zip' -print -quit)"
+          test -n "$BUILT_ZIP"
+          RELEASE_ZIP="dist/CookieCloud-Community-for-Firefox-v1.0.4.zip"
+          cp "$BUILT_ZIP" "$RELEASE_ZIP"
+          unzip -p "$RELEASE_ZIP" manifest.json > /tmp/firefox-manifest.json
+          test -s /tmp/firefox-manifest.json
+
+      - name: Verify Firefox manifest
+        run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
 
-          const manifest = JSON.parse(
-            fs.readFileSync('/tmp/firefox-manifest.json', 'utf8')
-          );
+          const manifest = JSON.parse(fs.readFileSync('/tmp/firefox-manifest.json', 'utf8'));
           const settings = manifest.browser_specific_settings;
           const gecko = settings?.gecko;
-          const geckoAndroid = settings?.gecko_android;
+          const android = settings?.gecko_android;
           const required = gecko?.data_collection_permissions?.required ?? [];
 
-          if (manifest.version !== '1.0.4') {
-            throw new Error(`Unexpected extension version: ${manifest.version}`);
-          }
-
-          if (gecko?.id !== 'cookiecloud-firefox@neoheee.github.io') {
-            throw new Error('Firefox extension ID is missing or incorrect.');
-          }
-
-          if (geckoAndroid?.strict_min_version !== '120.0') {
-            throw new Error('Firefox Android compatibility metadata is missing or incorrect.');
-          }
+          if (manifest.version !== '1.0.4') throw new Error(`Unexpected version: ${manifest.version}`);
+          if (gecko?.id !== 'cookiecloud-firefox@neoheee.github.io') throw new Error('Incorrect Firefox add-on ID.');
+          if (android?.strict_min_version !== '120.0') throw new Error('Incorrect Firefox Android minimum version.');
 
           for (const permission of ['websiteContent', 'browsingActivity']) {
-            if (!required.includes(permission)) {
-              throw new Error(`Missing Firefox data collection permission: ${permission}`);
-            }
+            if (!required.includes(permission)) throw new Error(`Missing data category: ${permission}`);
           }
 
-          console.log('Firefox Desktop and Android manifest metadata verified.');
+          console.log('Firefox manifest verified.');
           NODE
 
       - name: Lint packaged extension with Mozilla web-ext
         run: |
-          ZIP_PATH="$(find dist -maxdepth 1 -type f -name '*firefox*.zip' -print -quit)"
           rm -rf /tmp/cookiecloud-firefox-lint
           mkdir -p /tmp/cookiecloud-firefox-lint
-          unzip -q "$ZIP_PATH" -d /tmp/cookiecloud-firefox-lint
+          unzip -q dist/CookieCloud-Community-for-Firefox-v1.0.4.zip -d /tmp/cookiecloud-firefox-lint
           pnpm dlx web-ext@8 lint --source-dir /tmp/cookiecloud-firefox-lint
 
       - name: Create AMO source package
         working-directory: .
         run: |
           VERSION="$(node -p "require('./ext/package.json').version")"
-          SOURCE_NAME="cookiecloud-${VERSION}-amo-source"
+          SOURCE_NAME="cookiecloud-community-for-firefox-${VERSION}-source"
           SOURCE_DIR="/tmp/${SOURCE_NAME}"
           SOURCE_ZIP="$GITHUB_WORKSPACE/ext/dist/${SOURCE_NAME}.zip"
 
           rm -rf "$SOURCE_DIR"
           mkdir -p "$SOURCE_DIR/ext"
-
           rsync -a \
-            --exclude 'node_modules' \
-            --exclude 'dist' \
-            --exclude '.output' \
-            --exclude '.wxt' \
+            --exclude node_modules \
+            --exclude dist \
+            --exclude .output \
+            --exclude .wxt \
             ext/ "$SOURCE_DIR/ext/"
-
           cp README.md LICENSE PRIVACY.md "$SOURCE_DIR/"
 
-          (
-            cd /tmp
-            zip -qr "$SOURCE_ZIP" "$SOURCE_NAME"
-          )
-
+          (cd /tmp && zip -qr "$SOURCE_ZIP" "$SOURCE_NAME")
           test -s "$SOURCE_ZIP"
-          echo "Created AMO source archive: $SOURCE_ZIP"
 
       - name: Upload Firefox package
         uses: actions/upload-artifact@v4
         with:
-          name: cookiecloud-firefox-v1.0.4-desktop-android
-          path: ext/dist/*firefox*.zip
+          name: cookiecloud-community-for-firefox
+          path: ext/dist/CookieCloud-Community-for-Firefox-v1.0.4.zip
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload AMO source package
         uses: actions/upload-artifact@v4
         with:
-          name: cookiecloud-firefox-v1.0.4-amo-source
-          path: ext/dist/*amo-source.zip
+          name: cookiecloud-community-for-firefox-source
+          path: ext/dist/*-source.zip
           if-no-files-found: error
           retention-days: 30
