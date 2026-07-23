@@ -1,11 +1,13 @@
 <div align="center">
+  <img src="ext/public/icon/128.png" width="128" alt="CookieCloud Community for Firefox">
   <h1>CookieCloud Community for Firefox</h1>
-  <p><strong>将浏览器 Cookie 与可选的 Local Storage 加密同步到你自己的服务器</strong></p>
-  <p>基于 easychen/CookieCloud 的 Firefox 社区适配版，同时面向 Firefox Desktop 与 Firefox Android。</p>
+  <p><strong>Firefox Desktop 与 Firefox Android 专用的 CookieCloud 社区版扩展</strong></p>
+  <p>同步 Cookie，并可选同步匹配域名的 Local Storage；数据在浏览器本地加密后发送到用户配置的 CookieCloud 服务端。</p>
 
   <p>
     <a href="PRIVACY.md">隐私说明</a> ·
-    <a href="https://github.com/easychen/CookieCloud">上游项目</a>
+    <a href="https://github.com/easychen/CookieCloud">上游项目与服务端</a> ·
+    <a href="https://github.com/NeoHeee/CookieCloud-Community-for-Firefox/issues">问题反馈</a>
   </p>
 
   <p>
@@ -18,100 +20,98 @@
 
 ---
 
-## 项目说明
+## 仓库范围
 
-CookieCloud 由浏览器扩展和可自建服务端组成。扩展读取用户指定范围内的 Cookie，并可在明确启用后同步对应网站的 Local Storage；同步内容在浏览器本地加密后，发送到用户配置的 CookieCloud 服务端。
+本仓库**只保留 Firefox 浏览器扩展**及其构建、测试、AMO 审核所需文件，不包含：
 
-本仓库复刻自 [easychen/CookieCloud](https://github.com/easychen/CookieCloud)，主要补充：
+- CookieCloud 服务端源码或 Docker 部署文件；
+- Chrome、Edge 或其他 Chromium 浏览器的构建与发布流程；
+- 上游示例、SDK、截图和无关脚手架文件。
 
-- Firefox Desktop 与 Firefox Android Manifest 兼容配置；
-- Android 移动端自适应布局和触控尺寸优化；
-- GitHub Actions 可复现构建、Manifest 校验及 Mozilla `web-ext lint`；
-- AMO 源码审核包、构建说明和隐私说明；
-- Firefox 独立扩展 ID 与数据收集声明。
+CookieCloud 服务端和其他平台版本请前往上游项目：[easychen/CookieCloud](https://github.com/easychen/CookieCloud)。
 
-> 本仓库是社区维护的 Firefox 适配版本，不是 easychen 原作者发布的官方 Firefox 扩展。
+> 本项目是社区维护的 Firefox 适配版本，不是 easychen 原作者发布的官方 Firefox 扩展。
 
-## 当前版本
+## 支持范围
 
-### Firefox v1.0.4
-
-- Firefox Desktop：支持；
-- Firefox Android：声明支持 Firefox 120 及以上版本；
-- Android 页面：扩展操作页会自适应手机全屏，按钮增加触控高度并兼容底部安全区；
-- 自动检查：TypeScript、Firefox Manifest、Mozilla `web-ext lint`；
-- 真机状态：自动化兼容检查已加入。
-
-同一个 Firefox ZIP 包同时用于桌面版和 Android 版，平台兼容信息由 `browser_specific_settings.gecko` 与 `gecko_android` 声明。
-
-## 浏览器支持
-
-| 浏览器 | 状态 | 说明 |
+| 平台 | 状态 | 最低版本 |
 |---|---|---|
-| Firefox Desktop | ✅ 支持 | 已完成桌面端功能测试 |
-| Firefox Android 120+ | 🧪 已适配 | Manifest 与移动布局已完成，待真机完整复测 |
-| Chrome | ✅ 上游支持 | 建议使用 easychen 官方商店版本 |
-| Microsoft Edge | ✅ 上游支持 | 建议使用 easychen 官方商店版本 |
-| 其他 Chromium 浏览器 | ⚠️ 未完整验证 | 参考上游项目说明 |
+| Firefox Desktop | ✅ 支持 | 由 AMO Manifest 决定 |
+| Firefox Android | 🧪 已适配 | Firefox 120+ |
 
-Firefox 与 Chromium 的 Cookie 数据结构存在差异，**不要让 Firefox 与 Chrome/Edge 使用同一个上传 UUID**，避免相互覆盖。
+Firefox Android 已加入 Manifest 声明、全屏移动布局、触控尺寸和安全区域适配。发布前仍建议在真机复测上传、下载、定时同步和 Local Storage 同步。
 
+## 功能
 
+- 手动或定时上传、下载 Cookie；
+- 按域名关键词筛选同步范围；
+- 域名黑名单；
+- 可选同步 Local Storage；
+- Cookie Keep Alive；
+- 用户自定义服务端地址和附加请求 Header；
+- 本地加密后再传输同步载荷。
 
-## 安全须知
+## 安全提醒
 
-Cookie 是网站登录状态的重要凭据。CookieCloud 为实现同步，需要申请读取网站 Cookie 和访问网站数据的高权限。请按高敏感工具管理：
+Cookie 属于高敏感登录凭据。本扩展需要申请 `cookies`、`<all_urls>` 等高权限才能工作。建议：
 
-- 优先使用自己的 CookieCloud 服务端，不建议长期使用公共测试服务器；
-- 服务端必须使用 HTTPS，避免公网明文传输；
-- UUID 和密码均使用独立随机值，密码建议至少 24 位；
-- 不要同步网银、支付、主邮箱、密码管理器、域名注册商、Cloudflare、NAS 管理后台等关键账户；
-- Local Storage 可能包含长期 Token，不需要时不要开启；
-- Firefox、Chrome 和 Edge 分别使用不同 UUID；
-- 定期更换密码，停用时清除服务端数据和本地扩展配置。
+- 优先连接可信的自建 CookieCloud 服务端，并使用 HTTPS；
+- UUID 和密码使用互不重复的随机值，密码建议至少 24 位；
+- 不同步网银、支付、主邮箱、密码管理器、域名注册商、Cloudflare 或 NAS 管理后台；
+- 不需要 Local Storage 时将其关闭；
+- Firefox 与 Chrome/Edge 使用不同 UUID，避免数据格式相互覆盖。
 
-扩展在上传前会在浏览器本地加密同步内容，但加密不能消除弱密码、浏览器失陷、恶意服务端或配置泄露带来的风险。详见 [隐私说明](PRIVACY.md)。
+详见 [PRIVACY.md](PRIVACY.md)。
 
-## 自建服务端
+## 本地开发
 
-### Docker Compose
-
-```yaml
-services:
-  cookiecloud:
-    image: easychen/cookiecloud:latest
-    container_name: cookiecloud
-    restart: unless-stopped
-    ports:
-      - "8088:8088"
-    volumes:
-      - ./data:/data/api/data
-    environment:
-      API_ROOT: /cookiecloud-your-random-path
-```
-
-启动：
+需要 Node.js 22 与 pnpm 10.28.0：
 
 ```bash
-docker compose up -d
+git clone https://github.com/NeoHeee/CookieCloud-Community-for-Firefox.git
+cd CookieCloud-Community-for-Firefox/ext
+
+corepack enable
+corepack prepare pnpm@10.28.0 --activate
+pnpm install --frozen-lockfile
+pnpm compile
+pnpm dev
 ```
 
-扩展中的服务器地址示例：
+## 构建 Firefox 包
+
+```bash
+cd ext
+pnpm install --frozen-lockfile
+pnpm compile
+pnpm zip
+```
+
+输出目录：
 
 ```text
-https://cookie.example.com/cookiecloud-your-random-path
+ext/dist/*firefox*.zip
 ```
 
-生产环境建议使用可信反向代理或 Cloudflare Tunnel 提供 HTTPS，不要直接将 `8088` 的 HTTP 服务暴露到公网。
+未签名 ZIP 只适合开发测试。正式版 Firefox 长期安装需要由 Mozilla AMO 签名。
 
+## 目录结构
 
+```text
+.github/workflows/build-firefox.yml  Firefox 构建与校验
+ext/                                Firefox 扩展源码
+  entrypoints/                      后台、内容脚本与设置界面
+  public/                           多语言和图标
+  utils/                            Cookie、存储和加密逻辑
+  AMO_BUILD.md                      Mozilla 可复现构建说明
+LICENSE                             GPL-3.0
+PRIVACY.md                          隐私说明
+```
 
-## 项目关系与许可证
+## 许可证与来源
 
 - 上游项目：[easychen/CookieCloud](https://github.com/easychen/CookieCloud)
-- Firefox 社区适配：[NeoHeee/CookieCloud-Community-for-Firefox](https://github.com/NeoHeee/CookieCloud-Community-for-Firefox)
-- 问题反馈：[GitHub Issues](https://github.com/NeoHeee/CookieCloud-Community-for-Firefox/issues)
-- 隐私说明：[PRIVACY.md](PRIVACY.md)
+- Firefox 社区版：[NeoHeee/CookieCloud-Community-for-Firefox](https://github.com/NeoHeee/CookieCloud-Community-for-Firefox)
 - 许可证：[GNU General Public License v3.0](LICENSE)
 
-感谢原作者 easychen 及所有贡献者。本仓库的改动继续按照 GPL-3.0 发布。
+感谢原作者 easychen 及所有贡献者。本仓库的修改继续按照 GPL-3.0 发布。

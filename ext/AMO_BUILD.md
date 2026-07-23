@@ -1,23 +1,19 @@
-# CookieCloud Firefox — AMO Build Instructions
+# CookieCloud Community for Firefox — AMO Build Instructions
 
-This document describes how to reproduce the unsigned Firefox Desktop and Firefox for Android extension package submitted to Mozilla Add-ons (AMO).
+This repository contains only the Firefox extension source and the files required to reproduce the package submitted to Mozilla Add-ons (AMO).
 
-## Source layout
+## Environment
 
-The Firefox extension source is located in the `ext/` directory. The project uses WXT, TypeScript, React, Vite/Rollup, and pnpm. Generated output is written to `ext/dist/`.
+- Ubuntu 24.04 LTS or another recent Linux distribution
+- Node.js 22.x
+- pnpm 10.28.0
+- Network access to the npm registry during dependency installation
 
-## Required build environment
+The package-manager version is pinned in `package.json`; JavaScript dependencies are locked in `pnpm-lock.yaml`.
 
-- Operating system: Ubuntu 24.04 LTS or another recent Linux distribution
-- Node.js: 22.x
-- pnpm: 10.28.0
-- Network access during dependency installation: npm registry only
+## Build
 
-The exact package-manager version is also pinned in `ext/package.json`, and all JavaScript dependencies are locked in `ext/pnpm-lock.yaml`.
-
-## Build commands
-
-Run these commands from the repository root:
+Run from the repository root:
 
 ```bash
 cd ext
@@ -25,41 +21,38 @@ corepack enable
 corepack prepare pnpm@10.28.0 --activate
 pnpm install --frozen-lockfile
 pnpm compile
-pnpm zip:firefox
+pnpm zip
 ```
 
-The resulting unsigned Firefox package is created under:
+The unsigned Firefox package is written to:
 
 ```text
 ext/dist/*firefox*.zip
 ```
 
-The same package is used for Firefox Desktop and Firefox for Android. Platform compatibility is declared in the generated manifest.
+## Source contents
 
-## Build notes
+The submitted source archive includes:
 
-- No environment variables, API keys, secrets, or private services are required.
-- The build does not download or execute remote code at runtime.
-- `pnpm install --frozen-lockfile` must be used so dependency versions exactly match the lockfile.
-- WXT bundles the extension source and dependencies into the submitted package.
-- The Firefox-specific manifest metadata is generated from `ext/wxt.config.ts`.
-- Firefox for Android compatibility is declared with `browser_specific_settings.gecko_android` and a minimum supported version of Firefox 120.
+- Firefox background and content scripts;
+- React popup/settings UI;
+- localization and icon assets;
+- WXT, TypeScript, PostCSS and Tailwind configuration;
+- `package.json` and `pnpm-lock.yaml`;
+- this reproducible-build document;
+- README, privacy notice and GPL-3.0 license.
+
+It excludes generated output, `node_modules`, server-side code, Chromium-specific release tooling, SDKs and unrelated scaffolding.
 
 ## Verification
 
-The GitHub Actions workflow `.github/workflows/build-firefox.yml` performs the same build and verifies that the packaged `manifest.json` contains:
+`.github/workflows/build-firefox.yml` performs the same build and verifies:
 
-- Version: `1.0.4`
-- Add-on ID: `cookiecloud-firefox@neoheee.github.io`
-- Firefox Android minimum version: `120.0`
-- Required data categories: `websiteContent` and `browsingActivity`
+- extension version `1.0.4`;
+- add-on ID `cookiecloud-firefox@neoheee.github.io`;
+- Firefox Android minimum version `120.0`;
+- required data categories `websiteContent` and `browsingActivity`;
+- Mozilla `web-ext lint` results;
+- generation of the unsigned Firefox package and AMO source archive.
 
-The workflow also:
-
-- runs TypeScript validation;
-- runs Mozilla `web-ext lint` against the packaged extension;
-- produces a separate AMO source archive containing these instructions and all source files required to reproduce the extension package.
-
-## Android testing note
-
-Manifest declaration and automated linting do not replace device testing. Before public AMO release, test installation, configuration, upload, download, scheduled synchronization, and Local Storage synchronization on a physical Android device or Android emulator running Firefox 120 or later.
+No API keys, environment variables, private services or remote runtime code are required.
