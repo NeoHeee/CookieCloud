@@ -1,68 +1,70 @@
-# CookieCloud Firefox Privacy Notice
+# CookieCloud Firefox 隐私声明
 
-_Last updated: July 23, 2026_
+*最后更新日期：2026年7月23日*
 
-CookieCloud is a browser extension that synchronizes browser cookies and, when enabled by the user, selected website local-storage data with a server chosen and configured by the user.
+CookieCloud 是一款浏览器扩展，用于将浏览器 Cookie，以及用户主动启用后所选择的网站本地存储数据，同步至由用户自行选择和配置的服务器。
 
-## Data the extension accesses
+## 扩展访问的数据
 
-To provide its synchronization functions, the extension may access:
+为了提供同步功能，本扩展可能会访问以下数据：
 
-- Browser cookies, including cookie names, values, domains, paths, expiration information, and security attributes.
-- Website domains and URLs associated with synchronized cookies.
-- Local-storage values for website domains explicitly matched by the user's synchronization settings.
-- Extension settings stored locally in the browser, including the configured server address, synchronization identifier, synchronization options, and schedule.
+* 浏览器 Cookie，包括 Cookie 的名称、值、域名、路径、过期时间及安全属性；
+* 与同步 Cookie 相关的网站域名和 URL；
+* 用户同步设置中明确匹配的网站域名所对应的本地存储数据；
+* 保存在浏览器本地的扩展设置，包括所配置的服务器地址、同步标识符、同步选项及同步计划。
 
-Cookies and local-storage values may contain authentication tokens or other highly sensitive account information.
+Cookie 和本地存储数据可能包含身份验证令牌或其他高度敏感的账户信息。
 
-## How data is used and transmitted
+## 数据的使用与传输方式
 
-The extension uses this data only to perform user-requested cookie and local-storage synchronization.
+本扩展仅将上述数据用于执行用户主动请求的 Cookie 和本地存储同步功能。
 
-Before upload, synchronized cookie and local-storage data is encrypted locally using the identifier and password configured by the user. The encrypted payload is then sent to the CookieCloud server address selected by the user. Downloaded payloads are decrypted locally in the browser before being restored.
+上传前，需要同步的 Cookie 和本地存储数据会使用用户配置的同步标识符和密码在本地进行加密。加密后的数据将发送至用户选择的 CookieCloud 服务器地址。下载的数据会在浏览器本地解密后再进行恢复。
 
-The extension does not intentionally include advertising, analytics, telemetry, or tracking services.
+本扩展不主动包含广告、数据分析、遥测或用户跟踪服务。
 
-## Server operators and third parties
+## 服务器运营方与第三方
 
-The maintainer of this Firefox fork does not receive synchronized data unless the user explicitly configures a server operated by that maintainer.
+除非用户明确配置了由本 Firefox 分支维护者运营的服务器，否则该维护者不会接收到用户同步的数据。
 
-Users may configure a self-hosted server, an official test server, or another third-party server. The chosen server operator may receive:
+用户可以配置自建服务器、官方测试服务器或其他第三方服务器。用户所选择的服务器运营方可能会接收到：
 
-- The encrypted synchronization payload.
-- The synchronization identifier.
-- Connection metadata normally visible to a web server, such as IP address, request time, and user-agent information.
+* 加密后的同步数据；
+* 同步标识符；
+* Web 服务器通常可以获取的连接元数据，例如 IP 地址、请求时间和用户代理信息。
 
-Data retention and server-side logging are controlled by the selected server operator. Users should prefer a trusted self-hosted server over public test or third-party services.
+数据保留期限和服务器端日志记录方式由用户所选择的服务器运营方决定。与公共测试服务器或第三方服务相比，建议用户优先使用可信的自建服务器。
 
-## Passwords and encryption
+## 密码与加密
 
-The synchronization password is used locally to derive the encryption key. Users should choose a long, unique password and protect both the password and synchronization identifier.
+同步密码会在本地用于派生加密密钥。用户应设置长度足够且唯一的密码，并妥善保护同步密码和同步标识符。
 
-Encryption reduces exposure of the synchronized content, but it does not eliminate all risk. A weak password, compromised browser, malicious server, or unauthorized access to the user's settings may expose account sessions.
+加密可以降低同步内容泄露的风险，但无法消除所有风险。密码强度不足、浏览器受到入侵、服务器存在恶意行为，或他人未经授权访问用户设置，都可能导致账户会话信息泄露。
 
-## Data sharing and sale
+## 数据共享与出售
 
-The extension does not sell user data. It does not intentionally share synchronized content with the extension maintainer, advertisers, data brokers, or analytics providers.
+本扩展不会出售用户数据，也不会主动向扩展维护者、广告商、数据经纪商或数据分析服务提供商共享同步内容。
 
-Data is transmitted only to the server address selected by the user as necessary to provide synchronization.
+仅在提供同步功能所必需的情况下，数据才会传输至用户自行选择的服务器地址。
 
-## Data control and deletion
+## 数据控制与删除
 
-Users can stop transmission at any time by disabling synchronization, clearing the extension configuration, uninstalling the extension, or changing the configured server.
+用户可以随时通过以下方式停止数据传输：关闭同步功能、清除扩展配置、卸载扩展，或更改所配置的服务器。
 
-Deleting data already stored on a server depends on the server implementation and operator. Users running their own server can remove the stored server data directly. Users of a third-party server should contact that server operator or stop using that service.
+对于已经存储在服务器上的数据，其删除方式取决于服务器的具体实现和运营方。使用自建服务器的用户可以自行删除服务器中保存的数据；使用第三方服务器的用户应联系相应服务器运营方，或停止使用该服务。
 
-## Browser permissions
+## 浏览器权限
 
-CookieCloud requests broad browser permissions because its core function requires it to read and restore cookies across websites and, when enabled, access matching website local-storage values. These permissions should be treated as highly sensitive.
+CookieCloud 需要申请较为广泛的浏览器权限，因为其核心功能要求扩展能够读取和恢复多个网站的 Cookie，并在用户启用相关功能后，访问匹配网站的本地存储数据。
 
-## Changes to this notice
+这些权限具有高度敏感性，用户应谨慎对待。
 
-Material changes to this notice will be published in this repository with an updated revision date.
+## 本声明的变更
 
-## Contact
+如果本隐私声明发生重大变更，相关内容将在本代码仓库中发布，并同步更新修订日期。
 
-Questions or security concerns can be submitted through the issue tracker for this repository:
+## 联系方式
+
+如有疑问或需要报告安全问题，可以通过本代码仓库的 Issue 页面提交：
 
 `https://github.com/NeoHeee/CookieCloud-Community-for-Firefox/issues`
