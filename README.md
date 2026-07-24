@@ -28,9 +28,8 @@
 - Chrome、Edge 或其他 Chromium 浏览器的构建与发布流程；
 - 上游示例、SDK、截图和无关文件。
   
-Firefox 浏览器扩展商店 [CookieCloud-Community](https://addons.mozilla.org/zh-CN/firefox/addon/cookiecloud-community)。
-
-服务端部署及其他浏览器版本请查看 [easychen/CookieCloud](https://github.com/easychen/CookieCloud)。
+- Firefox 浏览器扩展商店 [CookieCloud-Community](https://addons.mozilla.org/zh-CN/firefox/addon/cookiecloud-community)。
+- 服务端部署及其他浏览器版本请查看 [easychen/CookieCloud](https://github.com/easychen/CookieCloud)。
 
 ## 当前版本
 
